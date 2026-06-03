@@ -1,0 +1,89 @@
+<div class="page">
+  <div class="page-head">
+    <div class="page-title"><i class="ti ti-calendar"></i> Planner</div>
+    <div class="page-sub">Grocery list & weekly meal planner</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab()==='grocery'" (click)="activeTab.set('grocery')">
+      <i class="ti ti-shopping-cart"></i> Grocery List
+    </button>
+    <button class="tab" [class.active]="activeTab()==='meal'" (click)="activeTab.set('meal')">
+      <i class="ti ti-calendar-week"></i> Meal Plan
+    </button>
+  </div>
+
+  <!-- Grocery tab -->
+  @if (activeTab() === 'grocery') {
+    <!-- Add item -->
+    <div class="add-row">
+      <input class="form-input" placeholder="Add grocery item…"
+        [ngModel]="newItem()" (ngModelChange)="newItem.set($event)" (keyup.enter)="addToGrocery()" />
+      <input class="form-input qty" placeholder="Qty"
+        [ngModel]="newQty()" (ngModelChange)="newQty.set($event)" (keyup.enter)="addToGrocery()" />
+      <button class="btn-add-item" (click)="addToGrocery()"><i class="ti ti-plus"></i></button>
+    </div>
+
+    <!-- Suggested from expiring -->
+    @if (suggestedGrocery().length > 0) {
+      <div class="suggest-section">
+        <div class="suggest-title"><i class="ti ti-wand"></i> Suggested (expiring soon)</div>
+        <div class="suggest-chips">
+          @for (item of suggestedGrocery(); track item.name) {
+            <button class="suggest-chip" (click)="addSuggested(item)">
+              {{ svc.catEmoji(item.cat) }} {{ item.name }}
+              <i class="ti ti-plus"></i>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- List -->
+    @if (groceryItems().length === 0) {
+      <div class="empty">
+        <i class="ti ti-shopping-cart"></i>
+        <p>Your grocery list is empty</p>
+        <p class="sub">Add items above or from suggestions</p>
+      </div>
+    } @else {
+      <div class="list-header">
+        <span>{{ uncheckedCount }} items remaining</span>
+        @if (hasCheckedItems()) {
+          <button class="clear-btn" (click)="clearChecked()">Clear checked</button>
+        }
+      </div>
+      <div class="grocery-list">
+        @for (item of groceryItems(); track item.id) {
+          <div class="grocery-item" [class.checked]="item.checked">
+            <div class="gi-check" (click)="toggleCheck(item.id)" [class.done]="item.checked">
+              @if (item.checked) { <i class="ti ti-check"></i> }
+            </div>
+            <div class="gi-info">
+              <div class="gi-name">{{ item.name }}</div>
+              <div class="gi-qty">{{ item.qty }}</div>
+            </div>
+            <button class="gi-del" (click)="removeItem(item.id)"><i class="ti ti-x"></i></button>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- Meal plan tab -->
+  @if (activeTab() === 'meal') {
+    <div class="meal-plan">
+      @for (day of weekMeals(); track day.day) {
+        <div class="meal-day">
+          <div class="day-label">{{ day.emoji }} {{ day.day }}</div>
+          <div class="meals">
+            <div class="meal-slot"><span class="meal-type">🌅 Breakfast</span><span class="meal-name">{{ day.breakfast }}</span></div>
+            <div class="meal-slot"><span class="meal-type">☀️ Lunch</span><span class="meal-name">{{ day.lunch }}</span></div>
+            <div class="meal-slot"><span class="meal-type">🌙 Dinner</span><span class="meal-name">{{ day.dinner }}</span></div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+<div class="toast" [class.show]="toastVisible()" role="status">{{ toastMsg() }}</div>

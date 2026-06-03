@@ -1,0 +1,262 @@
+<div class="auth-wrap">
+
+  <!-- ── Splash / Landing ─────────────────────────────────────────── -->
+  @if (page() === 'splash') {
+    <div class="splash">
+      <div class="splash-bg">
+        <div class="blob b1"></div>
+        <div class="blob b2"></div>
+        <div class="blob b3"></div>
+      </div>
+
+      <div class="splash-content">
+        <div class="app-logo">
+          <div class="logo-icon">🌿</div>
+          <div class="logo-text">Smart<span>Food</span></div>
+          <div class="logo-sub">Expiry Tracker</div>
+        </div>
+
+        <div class="splash-tagline">
+          Waste less · Eat fresh · Save money
+        </div>
+
+        <div class="feature-pills">
+          <div class="pill"><i class="ti ti-scan"></i> Barcode Scanner</div>
+          <div class="pill"><i class="ti ti-tools-kitchen-2"></i> AI Recipes</div>
+          <div class="pill"><i class="ti ti-bell"></i> Expiry Alerts</div>
+        </div>
+
+        <div class="splash-illustration">
+          <div class="food-items">
+            <span class="fi fi1">🥛</span>
+            <span class="fi fi2">🥦</span>
+            <span class="fi fi3">🍞</span>
+            <span class="fi fi4">🥩</span>
+            <span class="fi fi5">🧃</span>
+            <span class="fi fi6">🫙</span>
+          </div>
+        </div>
+
+        <div class="splash-actions">
+          <button class="btn-primary" (click)="goToSignup()">
+            <i class="ti ti-user-plus"></i> Create Free Account
+          </button>
+          <button class="btn-outline" (click)="goToLogin()">
+            <i class="ti ti-login"></i> Sign In
+          </button>
+        </div>
+
+        <div class="splash-note">
+          Free forever · No credit card required
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── Login ────────────────────────────────────────────────────── -->
+  @if (page() === 'login') {
+    <div class="auth-page">
+      <div class="auth-header">
+        <div class="back-app-logo">🌿 Smart<span>Food</span></div>
+        <div class="auth-title">Welcome back!</div>
+        <div class="auth-sub">Sign in to your account</div>
+      </div>
+
+      <!-- Google -->
+      <button class="btn-google" (click)="googleLogin()" [disabled]="loginLoading()">
+        <svg width="18" height="18" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="divider"><span>or sign in with email</span></div>
+
+      @if (loginError()) {
+        <div class="error-msg"><i class="ti ti-alert-circle"></i> {{ loginError() }}</div>
+      }
+
+      <div class="form-field">
+        <label class="form-label">Email address</label>
+        <div class="input-wrap">
+          <i class="ti ti-mail input-icon"></i>
+          <input class="form-input" type="email" placeholder="you@example.com"
+            [ngModel]="loginEmail()" (ngModelChange)="loginEmail.set($event)"
+            (keyup.enter)="login()" />
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">
+          Password
+          <button class="forgot-link" (click)="goToForgot()">Forgot password?</button>
+        </label>
+        <div class="input-wrap">
+          <i class="ti ti-lock input-icon"></i>
+          <input class="form-input" [type]="showLoginPwd() ? 'text' : 'password'"
+            placeholder="Enter your password"
+            [ngModel]="loginPassword()" (ngModelChange)="loginPassword.set($event)"
+            (keyup.enter)="login()" />
+          <button class="eye-btn" (click)="toggleLoginPwd()">
+            <i class="ti" [class.ti-eye]="!showLoginPwd()" [class.ti-eye-off]="showLoginPwd()"></i>
+          </button>
+        </div>
+      </div>
+
+      <button class="btn-primary" (click)="login()" [disabled]="loginLoading()">
+        @if (loginLoading()) { <i class="ti ti-loader-2 spin"></i> Signing in… }
+        @else { <i class="ti ti-login"></i> Sign In }
+      </button>
+
+      <div class="switch-auth">
+        Don't have an account?
+        <button class="link-btn" (click)="goToSignup()">Create one free</button>
+      </div>
+    </div>
+  }
+
+  <!-- ── Signup ────────────────────────────────────────────────────── -->
+  @if (page() === 'signup') {
+    <div class="auth-page">
+      <div class="auth-header">
+        <div class="back-app-logo">🌿 Smart<span>Food</span></div>
+        <div class="auth-title">Create account</div>
+        <div class="auth-sub">Start tracking for free — no credit card needed</div>
+      </div>
+
+      <!-- Google -->
+      <button class="btn-google" (click)="googleSignup()" [disabled]="signupLoading()">
+        <svg width="18" height="18" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="divider"><span>or sign up with email</span></div>
+
+      @if (signupError()) {
+        <div class="error-msg"><i class="ti ti-alert-circle"></i> {{ signupError() }}</div>
+      }
+
+      <div class="form-field">
+        <label class="form-label">Full name</label>
+        <div class="input-wrap">
+          <i class="ti ti-user input-icon"></i>
+          <input class="form-input" type="text" placeholder="Your full name"
+            [ngModel]="signupName()" (ngModelChange)="signupName.set($event)" />
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Email address</label>
+        <div class="input-wrap">
+          <i class="ti ti-mail input-icon"></i>
+          <input class="form-input" type="email" placeholder="you@example.com"
+            [ngModel]="signupEmail()" (ngModelChange)="signupEmail.set($event)" />
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
+          <i class="ti ti-lock input-icon"></i>
+          <input class="form-input" [type]="showSignupPwd() ? 'text' : 'password'"
+            placeholder="Min. 6 characters"
+            [ngModel]="signupPassword()" (ngModelChange)="signupPassword.set($event)" />
+          <button class="eye-btn" (click)="toggleSignupPwd()">
+            <i class="ti" [class.ti-eye]="!showSignupPwd()" [class.ti-eye-off]="showSignupPwd()"></i>
+          </button>
+        </div>
+        @if (signupPassword()) {
+          <div class="pwd-strength">
+            <div class="pwd-bar">
+              <div class="pwd-fill"
+                [style.width.%]="pwdStrength(signupPassword()).width"
+                [style.background]="pwdStrength(signupPassword()).color">
+              </div>
+            </div>
+            <span class="pwd-label" [style.color]="pwdStrength(signupPassword()).color">
+              {{ pwdStrength(signupPassword()).label }}
+            </span>
+          </div>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Confirm password</label>
+        <div class="input-wrap">
+          <i class="ti ti-lock-check input-icon"></i>
+          <input class="form-input" type="password" placeholder="Repeat your password"
+            [ngModel]="signupConfirm()" (ngModelChange)="signupConfirm.set($event)"
+            (keyup.enter)="signup()" />
+          @if (signupConfirm() && signupPassword() === signupConfirm()) {
+            <i class="ti ti-circle-check match-icon"></i>
+          }
+        </div>
+      </div>
+
+      <div class="terms-row">
+        <div class="checkbox" [class.checked]="agreeTerms()" (click)="toggleTerms()">
+          @if (agreeTerms()) { <i class="ti ti-check"></i> }
+        </div>
+        <span class="terms-text">I agree to the <a href="#" class="terms-link">Terms of Service</a> and <a href="#" class="terms-link">Privacy Policy</a></span>
+      </div>
+
+      <button class="btn-primary" (click)="signup()" [disabled]="signupLoading()">
+        @if (signupLoading()) { <i class="ti ti-loader-2 spin"></i> Creating account… }
+        @else { <i class="ti ti-user-plus"></i> Create Free Account }
+      </button>
+
+      <div class="switch-auth">
+        Already have an account?
+        <button class="link-btn" (click)="goToLogin()">Sign in</button>
+      </div>
+    </div>
+  }
+
+  <!-- ── Forgot Password ───────────────────────────────────────────── -->
+  @if (page() === 'forgot') {
+    <div class="auth-page">
+      <button class="back-btn" (click)="goToLogin()">
+        <i class="ti ti-arrow-left"></i> Back to login
+      </button>
+
+      <div class="auth-header">
+        <div class="forgot-icon">🔐</div>
+        <div class="auth-title">Reset password</div>
+        <div class="auth-sub">Enter your email and we'll send a reset link</div>
+      </div>
+
+      @if (!forgotSent()) {
+        <div class="form-field">
+          <label class="form-label">Email address</label>
+          <div class="input-wrap">
+            <i class="ti ti-mail input-icon"></i>
+            <input class="form-input" type="email" placeholder="you@example.com"
+              [ngModel]="forgotEmail()" (ngModelChange)="forgotEmail.set($event)"
+              (keyup.enter)="sendReset()" />
+          </div>
+        </div>
+
+        <button class="btn-primary" (click)="sendReset()" [disabled]="forgotLoading() || !forgotEmail().trim()">
+          @if (forgotLoading()) { <i class="ti ti-loader-2 spin"></i> Sending… }
+          @else { <i class="ti ti-send"></i> Send Reset Link }
+        </button>
+      } @else {
+        <div class="success-box">
+          <div class="success-icon-big">📧</div>
+          <div class="success-title">Check your email!</div>
+          <div class="success-msg">We sent a password reset link to <strong>{{ forgotEmail() }}</strong></div>
+          <button class="btn-primary" (click)="goToLogin()">Back to Sign In</button>
+        </div>
+      }
+    </div>
+  }
+
+</div>

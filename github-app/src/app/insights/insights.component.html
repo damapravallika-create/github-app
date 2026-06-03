@@ -1,0 +1,113 @@
+<div class="page">
+  <div class="page-head">
+    <div class="page-title"><i class="ti ti-chart-bar"></i> Insights & Analytics</div>
+    <div class="page-sub">Track your food waste and savings</div>
+  </div>
+
+  <!-- Waste Score -->
+  <div class="score-card">
+    <div class="score-left">
+      <div class="score-label">Freshness Score</div>
+      <div class="score-num" [style.color]="scoreColor()">{{ wasteScore() }}%</div>
+      <div class="score-status">{{ scoreLabel() }}</div>
+    </div>
+    <div class="score-ring">
+      <svg viewBox="0 0 100 100" width="100" height="100">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#2d4a2d" stroke-width="10"/>
+        <circle cx="50" cy="50" r="40" fill="none"
+          [attr.stroke]="scoreColor()" stroke-width="10"
+          stroke-linecap="round"
+          [attr.stroke-dasharray]="251"
+          [attr.stroke-dashoffset]="251 - (251 * wasteScore() / 100)"
+          transform="rotate(-90 50 50)"/>
+        <text x="50" y="55" text-anchor="middle" font-size="20" font-weight="bold"
+          [attr.fill]="scoreColor()">{{ wasteScore() }}</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Key stats -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <i class="ti ti-package" style="color:#76c442"></i>
+      <div class="stat-num">{{ itemsTracked() }}</div>
+      <div class="stat-lbl">Items Tracked</div>
+    </div>
+    <div class="stat-box">
+      <i class="ti ti-currency-rupee" style="color:#f5a623"></i>
+      <div class="stat-num">₹{{ moneySaved() }}</div>
+      <div class="stat-lbl">Est. Saved</div>
+    </div>
+    <div class="stat-box">
+      <i class="ti ti-alert-triangle" style="color:#e74c3c"></i>
+      <div class="stat-num">{{ svc.expiredCount() }}</div>
+      <div class="stat-lbl">Wasted Items</div>
+    </div>
+    <div class="stat-box">
+      <i class="ti ti-circle-check" style="color:#76c442"></i>
+      <div class="stat-num">{{ svc.freshCount() }}</div>
+      <div class="stat-lbl">Fresh Items</div>
+    </div>
+  </div>
+
+  <!-- Status breakdown -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-chart-pie"></i> Status Breakdown</div>
+    @for (s of statusBreakdown(); track s.label) {
+      <div class="breakdown-row">
+        <div class="br-label">
+          <span class="br-dot" [style.background]="s.color"></span>
+          {{ s.label }}
+        </div>
+        <div class="br-bar-wrap">
+          <div class="br-bar">
+            <div class="br-fill" [style.width.%]="s.pct" [style.background]="s.color"></div>
+          </div>
+        </div>
+        <div class="br-count">{{ s.count }} ({{ s.pct }}%)</div>
+      </div>
+    }
+  </div>
+
+  <!-- Category breakdown -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-category"></i> By Category</div>
+    @for (c of catBreakdown(); track c.cat) {
+      <div class="cat-row">
+        <div class="cat-emoji">{{ svc.catEmoji(c.cat) }}</div>
+        <div class="cat-info">
+          <div class="cat-name">{{ c.cat | titlecase }}</div>
+          <div class="cat-bar">
+            <div class="cat-fill" [style.width.%]="c.pct"></div>
+          </div>
+        </div>
+        <div class="cat-count">{{ c.count }}</div>
+      </div>
+    }
+  </div>
+
+  <!-- Expiring this week -->
+  @if (topExpiring().length > 0) {
+    <div class="section">
+      <div class="section-title"><i class="ti ti-clock"></i> Expiring This Week</div>
+      @for (item of topExpiring(); track item.id) {
+        <div class="expiring-row">
+          <span>{{ svc.catEmoji(item.cat) }}</span>
+          <span class="er-name">{{ item.name }}</span>
+          <span class="er-days" [class.urgent]="svc.daysUntil(item.expiry) <= 1">
+            {{ svc.getStatusLabel(item.expiry) }}
+          </span>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Tips -->
+  <div class="section tips">
+    <div class="section-title"><i class="ti ti-bulb"></i> Tips to Reduce Waste</div>
+    <div class="tip"><i class="ti ti-check"></i> Check expiry dates when shopping</div>
+    <div class="tip"><i class="ti ti-check"></i> Store items at correct temperatures</div>
+    <div class="tip"><i class="ti ti-check"></i> Use expiring items in recipes first</div>
+    <div class="tip"><i class="ti ti-check"></i> Buy only what you need each week</div>
+  </div>
+</div>

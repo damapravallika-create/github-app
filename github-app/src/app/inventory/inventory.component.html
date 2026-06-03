@@ -1,0 +1,94 @@
+<div class="page">
+  <div class="page-head">
+    <div class="page-title"><i class="ti ti-archive"></i> Inventory</div>
+    <div class="page-sub">Organised by storage location · Batch & lot tracking</div>
+  </div>
+
+  <!-- Location tabs -->
+  <div class="loc-tabs">
+    <button class="loc-tab" [class.active]="activeLocation()==='all'" (click)="activeLocation.set('all')">
+      All <span class="lc">{{ countByLocation()['all'] }}</span>
+    </button>
+    @for (loc of locations; track loc.id) {
+      <button class="loc-tab" [class.active]="activeLocation()===loc.id" (click)="activeLocation.set(loc.id)">
+        {{ loc.emoji }} {{ loc.label }} <span class="lc">{{ countByLocation()[loc.id] }}</span>
+      </button>
+    }
+  </div>
+
+  <!-- Search -->
+  <div class="search-wrap">
+    <i class="ti ti-search"></i>
+    <input class="search-input" placeholder="Search inventory…"
+      [ngModel]="searchQ()" (ngModelChange)="searchQ.set($event)" />
+  </div>
+
+  <!-- Items -->
+  @if (filtered().length === 0) {
+    <div class="empty">
+      <i class="ti ti-package"></i>
+      <p>No items found</p>
+    </div>
+  } @else {
+    <div class="inv-list">
+      @for (item of filtered(); track item.id) {
+        <div class="inv-card" [class.expired]="svc.getStatus(item.expiry)==='expired'"
+          [class.soon]="svc.getStatus(item.expiry)==='expires-soon'">
+
+          <div class="inv-top">
+            <div class="inv-left">
+              <span class="inv-emoji">{{ svc.catEmoji(item.cat) }}</span>
+              <div>
+                <div class="inv-name">{{ item.name }}</div>
+                <div class="inv-meta">
+                  {{ locationOf(item.cat)?.emoji }} {{ locationOf(item.cat)?.label }} ·
+                  {{ item.qty }} {{ item.unit }}
+                </div>
+              </div>
+            </div>
+            <div class="inv-status">
+              <div class="days-badge"
+                [class.exp]="svc.getStatus(item.expiry)==='expired'"
+                [class.soon]="svc.getStatus(item.expiry)==='expires-soon'"
+                [class.ok]="svc.getStatus(item.expiry)==='fresh'">
+                {{ svc.getStatusLabel(item.expiry) }}
+              </div>
+              <div class="inv-date">{{ svc.formatDate(item.expiry) }}</div>
+            </div>
+          </div>
+
+          <!-- Batch info -->
+          @if (getBatch(item.id)) {
+            <div class="batch-info">
+              <span><i class="ti ti-tag"></i> Batch: {{ getBatch(item.id)?.batch }}</span>
+              @if (getBatch(item.id)?.mfg) {
+                <span><i class="ti ti-calendar"></i> MFG: {{ getBatch(item.id)?.mfg }}</span>
+              }
+            </div>
+          }
+
+          <!-- Batch edit -->
+          @if (editBatchId() === item.id) {
+            <div class="batch-edit">
+              <input class="batch-input" placeholder="Batch / Lot number"
+                [ngModel]="batchInput()" (ngModelChange)="batchInput.set($event)" />
+              <input class="batch-input" placeholder="MFG date (e.g. 01/05/2026)"
+                [ngModel]="mfgInput()" (ngModelChange)="mfgInput.set($event)" />
+              <div class="batch-actions">
+                <button class="btn-save-batch" (click)="saveBatch(item.id)">
+                  <i class="ti ti-check"></i> Save
+                </button>
+                <button class="btn-cancel-batch" (click)="editBatchId.set(null)">Cancel</button>
+              </div>
+            </div>
+          } @else {
+            <button class="batch-btn" (click)="startEditBatch(item.id)">
+              <i class="ti ti-tag"></i>
+              {{ getBatch(item.id) ? 'Edit batch info' : '+ Add batch / lot info' }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

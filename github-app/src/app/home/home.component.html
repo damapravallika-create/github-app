@@ -1,0 +1,163 @@
+<div class="page">
+
+  <!-- ── Header ─────────────────────────────────────────────────── -->
+  <header class="header">
+    <div>
+      <div class="logo">🌿 Smart<span>Food</span></div>
+      <div class="tagline">Waste less · Eat fresh · Save money</div>
+    </div>
+    <div class="header-right">
+      @if (svc.unreadAlerts() > 0) {
+        <div class="alert-pill">
+          <i class="ti ti-bell-ringing"></i> {{ svc.unreadAlerts() }} alert{{ svc.unreadAlerts() > 1 ? 's' : '' }}
+        </div>
+      }
+    </div>
+  </header>
+
+  <!-- ── Stats bar ───────────────────────────────────────────────── -->
+  <div class="statsbar">
+    <div class="statcard s-all"><div class="n">{{ svc.totalCount() }}</div><div class="l">Total</div></div>
+    <div class="statcard s-ok"><div class="n">{{ svc.freshCount() }}</div><div class="l">Fresh</div></div>
+    <div class="statcard s-soon"><div class="n">{{ svc.soonCount() }}</div><div class="l">Expiring</div></div>
+    <div class="statcard s-exp"><div class="n">{{ svc.expiredCount() }}</div><div class="l">Expired</div></div>
+  </div>
+
+  <!-- ── Urgent items strip ──────────────────────────────────────── -->
+  @if (svc.urgentItems().length > 0) {
+    <div class="section-head">
+      <i class="ti ti-alert-triangle" style="color:#f5a623"></i> Use these soon
+      <a routerLink="/recipes" class="see-all">Get Recipes →</a>
+    </div>
+    <div class="urgent-strip">
+      @for (item of svc.urgentItems(); track item.id) {
+        <div class="urgent-chip" [class.red]="svc.getStatus(item.expiry)==='expired'">
+          <span>{{ svc.catEmoji(item.cat) }}</span>
+          <span class="uc-name">{{ item.name }}</span>
+          <span class="uc-days">{{ svc.getStatusLabel(item.expiry) }}</span>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── Add toggle ─────────────────────────────────────────────── -->
+  @if (!showForm()) {
+    <button class="btn-show-add" (click)="toggleForm()">
+      <i class="ti ti-plus"></i> Add food item manually
+    </button>
+  } @else {
+    <div class="add-section">
+      <div class="add-title"><i class="ti ti-plus"></i> Add food item</div>
+      @if (formError()) { <div class="form-error">{{ formError() }}</div> }
+      <div class="form-grid">
+        <div class="form-field ff-full">
+          <label class="form-label" for="fn">Food / Medicine name</label>
+          <input id="fn" class="form-input" placeholder="e.g. Cheddar Cheese"
+            [ngModel]="formName()" (ngModelChange)="formName.set($event)" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="fc">Category</label>
+          <select id="fc" class="form-select" [ngModel]="formCat()" (ngModelChange)="formCat.set($event)">
+            @for (c of foodCats(); track c.id) {
+              <option [value]="c.id">{{ c.emoji }} {{ c.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="fe">Expiry date</label>
+          <input id="fe" class="form-input" type="date" [ngModel]="formExpiry()" (ngModelChange)="formExpiry.set($event)" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="fq">Qty</label>
+          <input id="fq" class="form-input" type="number" min="1" [ngModel]="formQty()" (ngModelChange)="formQty.set(+$event)" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="fu">Unit</label>
+          <input id="fu" class="form-input" placeholder="g / kg / pcs" [ngModel]="formUnit()" (ngModelChange)="formUnit.set($event)" />
+        </div>
+        <div class="form-field ff-full">
+          <label class="form-label" for="fno">Note</label>
+          <input id="fno" class="form-input" placeholder="e.g. Fridge shelf 1" [ngModel]="formNote()" (ngModelChange)="formNote.set($event)" />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-add" (click)="submitForm()"><i class="ti ti-check"></i> Add item</button>
+        <button class="btn-cancel" (click)="toggleForm()">Cancel</button>
+      </div>
+    </div>
+  }
+
+  <!-- ── Filter bar ─────────────────────────────────────────────── -->
+  <div class="filterbar">
+    @for (f of [['all','All'],['soon','Expiring'],['expired','Expired'],['fresh','Fresh']]; track f[0]) {
+      <button class="filter-btn" [class.active]="activeFilter()===f[0]" (click)="setFilter(f[0])">{{ f[1] }}</button>
+    }
+    <div class="search-wrap">
+      <i class="ti ti-search"></i>
+      <input class="search-input" placeholder="Search…" [ngModel]="searchQuery()" (ngModelChange)="setSearch($event)" />
+    </div>
+  </div>
+
+  <!-- ── Category tabs ──────────────────────────────────────────── -->
+  <div class="cattabs">
+    @for (cat of categories; track cat.id) {
+      <button class="cattab" [class.active]="activeCat()===cat.id" (click)="setCat(cat.id)">
+        <i class="ti {{ cat.icon }}"></i> {{ cat.label }}
+        <span class="cc">{{ svc.countByCategory(cat.id) }}</span>
+      </button>
+    }
+  </div>
+
+  <!-- ── Grid ───────────────────────────────────────────────────── -->
+  <div class="grid">
+    @if (displayItems().length === 0) {
+      <div class="empty"><i class="ti ti-mood-empty"></i><p>No items found</p></div>
+    }
+    @for (item of displayItems(); track item.id) {
+      <div class="card"
+        [class.expired]="svc.getStatus(item.expiry)==='expired'"
+        [class.soon]="svc.getStatus(item.expiry)==='expires-soon'"
+        [class.fresh]="svc.getStatus(item.expiry)==='fresh'">
+        <div class="card-accent"></div>
+        <div class="card-top">
+          <div class="card-left">
+            <div class="card-icon">{{ svc.catEmoji(item.cat) }}</div>
+            <div>
+              <div class="card-name">{{ item.name }}</div>
+              <div class="card-meta">
+                {{ item.cat | titlecase }}
+                @if (item.addedVia && item.addedVia !== 'manual') {
+                  <span class="via-badge">{{ item.addedVia === 'barcode' ? '📷' : '📄' }}</span>
+                }
+              </div>
+            </div>
+          </div>
+          <button class="del-btn" (click)="deleteItem(item.id, item.name)" [attr.aria-label]="'Delete '+item.name">
+            <i class="ti ti-trash"></i>
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="info-row"><span class="lbl">Qty</span><span class="val">{{ item.qty }} {{ item.unit }}</span></div>
+          <div class="info-row"><span class="lbl">Expires</span><span class="val">{{ svc.formatDate(item.expiry) }}</span></div>
+          @if (item.note) {
+            <div class="info-row"><span class="lbl">Note</span><span class="val note-val">{{ item.note }}</span></div>
+          }
+          <div class="days-badge"
+            [class.exp]="svc.getStatus(item.expiry)==='expired'"
+            [class.soon]="svc.getStatus(item.expiry)==='expires-soon'"
+            [class.ok]="svc.getStatus(item.expiry)==='fresh'">
+            <i class="ti {{ statusIcon(svc.getStatus(item.expiry)) }}"></i>
+            {{ svc.getStatusLabel(item.expiry) }}
+          </div>
+          <div class="prog-bar"><div class="prog-fill" [style.width.%]="svc.getProgressPct(item.expiry)"></div></div>
+        </div>
+      </div>
+    }
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" [class.show]="toastVisible()" [class.danger]="toastType()==='danger'" role="status">
+  {{ toastMsg() }}
+</div>

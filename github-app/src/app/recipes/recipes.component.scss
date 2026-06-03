@@ -1,0 +1,57 @@
+:host{display:block}
+.page{padding:0 1rem 80px;max-width:900px;margin:0 auto}
+.page-head{padding:1.25rem 0 1rem;border-bottom:1px solid #2d4a2d;margin-bottom:1.25rem}
+.page-title{font-family:'DM Serif Display',serif;font-size:22px;color:#f0ead6;display:flex;align-items:center;gap:8px;i{font-size:20px;color:#4caf50}}
+.page-sub{font-size:12px;color:#6a8f6a;margin-top:4px}
+
+.tabs{display:flex;gap:8px;margin-bottom:1.25rem}
+.tab{background:#162416;border:1px solid #2d4a2d;color:#6a8f6a;font-family:inherit;font-size:13px;padding:7px 16px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s;
+  i{font-size:14px}
+  &:hover{border-color:#4caf50;color:#e8f0e8}
+  &.active{background:#2d4a2d;border-color:#4caf50;color:#f0ead6;font-weight:600}
+}
+
+.use-soon-banner{display:flex;align-items:center;flex-wrap:wrap;gap:6px;background:#3d3010;border:1px solid #f5a623;border-radius:10px;padding:.75rem 1rem;font-size:12px;color:#f5c842;font-weight:600;margin-bottom:1.25rem;i{font-size:15px}}
+.use-chip{background:#1a1708;border:1px solid #f5a623;color:#f5c842;padding:2px 8px;border-radius:8px;font-size:11px}
+
+.empty-state{text-align:center;padding:3rem 1rem;color:#6a8f6a;i{font-size:44px;display:block;margin-bottom:.75rem;opacity:.4}p{font-size:14px}}
+
+.recipe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+
+.recipe-card{background:#162416;border:1px solid #2d4a2d;border-radius:12px;padding:1rem;cursor:pointer;position:relative;transition:all .2s;
+  &:hover{border-color:#4caf50;transform:translateY(-2px)}
+}
+.recipe-emoji{font-size:32px;margin-bottom:.5rem}
+.recipe-body{}
+.recipe-title{font-size:15px;font-weight:600;color:#f0ead6;margin-bottom:3px}
+.recipe-desc{font-size:12px;color:#6a8f6a;margin-bottom:.6rem;line-height:1.4}
+.recipe-meta{display:flex;align-items:center;gap:10px;font-size:11px;color:#8aab8a;margin-bottom:.5rem}
+.time-tag{display:flex;align-items:center;gap:3px;i{font-size:12px}}
+.diff-tag{font-weight:600}
+.uses-row{display:flex;flex-wrap:wrap;gap:4px}
+.use-ingredient{background:#1a2e1a;border:1px solid #2d4a2d;color:#76c442;font-size:10px;padding:2px 7px;border-radius:6px}
+
+.save-btn{position:absolute;top:.75rem;right:.75rem;background:transparent;border:none;color:#6a8f6a;cursor:pointer;font-size:18px;transition:all .2s;padding:4px;border-radius:6px;
+  &:hover,&.saved{color:#e74c3c}
+}
+
+// Drawer
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:flex;align-items:flex-end;justify-content:center}
+.drawer{background:#162416;border:1px solid #2d4a2d;border-radius:20px 20px 0 0;padding:1.5rem;width:100%;max-width:600px;max-height:80vh;overflow-y:auto;position:relative}
+.close-btn{position:absolute;top:1rem;right:1rem;background:#1a2e1a;border:1px solid #2d4a2d;color:#6a8f6a;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;
+  &:hover{border-color:#e74c3c;color:#e74c3c}
+}
+.drawer-emoji{font-size:40px;margin-bottom:.75rem}
+.drawer-title{font-family:'DM Serif Display',serif;font-size:22px;color:#f0ead6;margin-bottom:4px}
+.drawer-desc{font-size:13px;color:#8aab8a;margin-bottom:.75rem;line-height:1.5}
+.drawer-row{display:flex;gap:1.5rem;font-size:13px;color:#8aab8a;margin-bottom:1rem;i{margin-right:4px}}
+.drawer-section{margin-bottom:1rem}
+.drawer-sec-title{font-size:13px;font-weight:600;color:#e8f0e8;margin-bottom:.5rem}
+.ingr-list{padding-left:1.2rem;color:#a0bfa0;font-size:13px;li{margin-bottom:4px}}
+.btn-save-full{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:#1d3a1d;border:1px solid #4caf50;color:#76c442;font-family:inherit;font-size:14px;font-weight:600;padding:12px;border-radius:10px;cursor:pointer;transition:all .2s;i{font-size:16px}
+  &:hover,&.saved{background:#3d1a1a;border-color:#e74c3c;color:#e74c3c}
+}
+
+.toast{position:fixed;bottom:76px;right:1rem;background:#2d4a2d;border:1px solid #4caf50;color:#f0ead6;padding:9px 14px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;transform:translateY(60px);opacity:0;transition:all .3s;pointer-events:none;
+  &.show{transform:translateY(0);opacity:1}
+}

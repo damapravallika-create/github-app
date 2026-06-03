@@ -1,0 +1,38 @@
+<!-- More menu overlay -->
+@if (showMore()) {
+  <div class="more-overlay" (click)="showMore.set(false)">
+    <div class="more-menu" (click)="$event.stopPropagation()">
+      <div class="more-title">More Pages</div>
+      @for (item of moreItems; track item.path) {
+        <button class="more-item" (click)="goTo(item.path)">
+          <i class="ti {{ item.icon }}"></i>
+          {{ item.label }}
+        </button>
+      }
+    </div>
+  </div>
+}
+
+<nav class="bottom-nav" aria-label="Main navigation">
+  @for (item of navItems; track item.path) {
+    <a class="nav-item" [routerLink]="item.path" routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+      [attr.aria-label]="item.label">
+      <div class="nav-icon-wrap">
+        <i class="ti {{ item.icon }}" aria-hidden="true"></i>
+        @if (item.label === 'Home' && svc.unreadAlerts() > 0) {
+          <span class="badge">{{ svc.unreadAlerts() }}</span>
+        }
+      </div>
+      <span class="nav-label">{{ item.label }}</span>
+    </a>
+  }
+
+  <!-- More button -->
+  <button class="nav-item more-btn" (click)="toggleMore()" [class.active]="showMore()">
+    <div class="nav-icon-wrap">
+      <i class="ti ti-dots" aria-hidden="true"></i>
+    </div>
+    <span class="nav-label">More</span>
+  </button>
+</nav>

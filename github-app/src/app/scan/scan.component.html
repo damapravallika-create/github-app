@@ -1,0 +1,343 @@
+<div class="page">
+
+  <!-- ── Choose mode ─────────────────────────────────────────────── -->
+  @if (mode() === 'choose') {
+    <div class="page-head">
+      <div class="page-title"><i class="ti ti-scan"></i> Smart Scanner</div>
+      <div class="page-sub">Scan any product barcode to auto-fetch details from global database</div>
+    </div>
+
+    <div class="scan-options">
+
+      <!-- Live Camera -->
+      <div class="scan-card primary" (click)="startCamera()">
+        <div class="scan-icon-wrap">
+          <i class="ti ti-camera"></i>
+        </div>
+        <div class="scan-card-content">
+          <div class="scan-card-title">📷 Live Camera Scan</div>
+          <div class="scan-card-sub">Point your camera at any product barcode or QR code. Auto-detects and fetches product details instantly.</div>
+          <div class="scan-tags">
+            <span class="tag">EAN-13</span>
+            <span class="tag">EAN-8</span>
+            <span class="tag">UPC-A</span>
+            <span class="tag">QR Code</span>
+            <span class="tag">Code 128</span>
+          </div>
+        </div>
+        <i class="ti ti-chevron-right arrow"></i>
+      </div>
+
+      <!-- Manual barcode -->
+      <div class="scan-card" (click)="startManual()">
+        <div class="scan-icon-wrap secondary">
+          <i class="ti ti-keyboard"></i>
+        </div>
+        <div class="scan-card-content">
+          <div class="scan-card-title">🔢 Enter Barcode Manually</div>
+          <div class="scan-card-sub">Type the barcode number from the product packaging to look it up.</div>
+          <div class="scan-tags">
+            <span class="tag">Open Food Facts</span>
+            <span class="tag">Global DB</span>
+          </div>
+        </div>
+        <i class="ti ti-chevron-right arrow"></i>
+      </div>
+
+      <!-- OCR -->
+      <div class="scan-card" (click)="startOCR()">
+        <div class="scan-icon-wrap secondary">
+          <i class="ti ti-file-text"></i>
+        </div>
+        <div class="scan-card-content">
+          <div class="scan-card-title">📄 Scan Receipt / Label (OCR)</div>
+          <div class="scan-card-sub">Paste text from a product label or receipt. AI extracts the expiry date automatically.</div>
+          <div class="scan-tags">
+            <span class="tag">OCR Parser</span>
+            <span class="tag">Date Extraction</span>
+          </div>
+        </div>
+        <i class="ti ti-chevron-right arrow"></i>
+      </div>
+    </div>
+
+
+      <!-- Voice Scan -->
+      <div class="scan-card" (click)="startVoice()">
+        <div class="scan-icon-wrap secondary">
+          <i class="ti ti-microphone"></i>
+        </div>
+        <div class="scan-card-content">
+          <div class="scan-card-title">🎤 Voice Scan</div>
+          <div class="scan-card-sub">Say the product name and expiry date out loud. AI extracts the details automatically.</div>
+          <div class="scan-tags">
+            <span class="tag">Speech Recognition</span>
+            <span class="tag">Auto Extract</span>
+          </div>
+        </div>
+        <i class="ti ti-chevron-right arrow"></i>
+      </div>
+
+    <!-- How it works -->
+    <div class="hiw">
+      <div class="hiw-title"><i class="ti ti-info-circle"></i> How it works</div>
+      <div class="hiw-steps">
+        <div class="hiw-step"><span class="sn">1</span><span>Scan or enter the product barcode</span></div>
+        <div class="hiw-step"><span class="sn">2</span><span>App fetches name, brand, ingredients from Open Food Facts</span></div>
+        <div class="hiw-step"><span class="sn">3</span><span>Confirm or edit expiry date</span></div>
+        <div class="hiw-step"><span class="sn">4</span><span>Product is automatically saved to your pantry</span></div>
+      </div>
+    </div>
+  }
+
+  <!-- ── Camera mode ─────────────────────────────────────────────── -->
+  @if (mode() === 'camera') {
+    <div class="page-head">
+      <button class="back-btn" (click)="goBack()"><i class="ti ti-arrow-left"></i> Back</button>
+      <div class="page-title">📷 Camera Scanner</div>
+    </div>
+
+    @if (cameraError()) {
+      <div class="error-box">
+        <i class="ti ti-alert-circle"></i>
+        <div>
+          <div class="err-title">Camera Error</div>
+          <div class="err-msg">{{ cameraError() }}</div>
+        </div>
+      </div>
+      <button class="btn-primary" (click)="startManual()">
+        <i class="ti ti-keyboard"></i> Enter Barcode Manually Instead
+      </button>
+    } @else {
+      <!-- Viewfinder -->
+      <div class="viewfinder-wrap">
+        <video #videoEl autoplay playsinline muted class="camera-feed"></video>
+        <canvas #canvasEl class="scan-canvas"></canvas>
+
+        <!-- Overlay -->
+        <div class="vf-overlay">
+          <div class="vf-corner tl"></div>
+          <div class="vf-corner tr"></div>
+          <div class="vf-corner bl"></div>
+          <div class="vf-corner br"></div>
+          @if (cameraActive()) {
+            <div class="scan-laser"></div>
+          }
+        </div>
+
+        <!-- Status -->
+        <div class="vf-status" [class.detected]="detectedCode()">
+          <i class="ti" [class.ti-barcode]="!detectedCode()" [class.ti-circle-check]="detectedCode()"></i>
+          {{ scanStatus() }}
+        </div>
+      </div>
+
+      @if (!cameraActive() && !detectedCode()) {
+        <div class="camera-loading">
+          <i class="ti ti-loader-2 spin"></i> Starting camera…
+        </div>
+      }
+
+      <div class="camera-tip">
+        <i class="ti ti-bulb"></i>
+        Hold the barcode steady within the frame. Works best in good lighting.
+      </div>
+    }
+  }
+
+  <!-- ── Manual entry mode ───────────────────────────────────────── -->
+  @if (mode() === 'manual') {
+    <div class="page-head">
+      <button class="back-btn" (click)="goBack()"><i class="ti ti-arrow-left"></i> Back</button>
+      <div class="page-title">🔢 Enter Barcode</div>
+      <div class="page-sub">Type the barcode number printed on the product packaging</div>
+    </div>
+
+    <div class="manual-panel">
+      <div class="form-field">
+        <label class="form-label">Barcode / EAN number</label>
+        <input
+          class="form-input large"
+          type="number"
+          placeholder="e.g. 8901030781893"
+          [ngModel]="manualBarcode()"
+          (ngModelChange)="manualBarcode.set($event)"
+          (keyup.enter)="lookupManual()"
+        />
+      </div>
+
+      <button class="btn-primary" (click)="lookupManual()" [disabled]="!manualBarcode().trim()">
+        <i class="ti ti-search"></i> Look Up Product
+      </button>
+
+      <div class="sample-barcodes">
+        <div class="sample-label">Try these sample barcodes:</div>
+        <div class="sample-chips">
+          @for (sample of [
+            {code:'3017620422003', label:'Nutella 400g'},
+            {code:'5000159407236', label:'Heinz Beans'},
+            {code:'8901030874642', label:'Amul Butter'},
+            {code:'3228857000166', label:'Evian Water'},
+            {code:'4005900011695', label:'Kinder Surprise'}
+          ]; track sample.code) {
+            <button class="sample-chip" (click)="manualBarcode.set(sample.code)">
+              {{ sample.label }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── OCR mode ────────────────────────────────────────────────── -->
+  @if (mode() === 'ocr') {
+    <div class="page-head">
+      <button class="back-btn" (click)="goBack()"><i class="ti ti-arrow-left"></i> Back</button>
+      <div class="page-title">📄 Receipt / Label OCR</div>
+      <div class="page-sub">Paste product label or receipt text — AI extracts expiry date</div>
+    </div>
+
+    <div class="ocr-panel">
+      <div class="ocr-example">
+        <div class="example-lbl">Example input:</div>
+        <div class="example-text">Product: Greek Yoghurt 400g&#10;MFG: 20/05/2026&#10;EXP: 15/08/2026</div>
+        <button class="sample-chip" (click)="ocrText.set('Product: Greek Yoghurt 400g\nMFG: 20/05/2026\nEXP: 15/08/2026')">
+          Use example
+        </button>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Paste label / receipt text</label>
+        <textarea
+          class="form-textarea"
+          rows="6"
+          placeholder="Paste product label or receipt text here…"
+          [ngModel]="ocrText()"
+          (ngModelChange)="ocrText.set($event)"
+        ></textarea>
+      </div>
+
+      <button class="btn-primary" (click)="parseOCR()" [disabled]="!ocrText().trim()">
+        <i class="ti ti-wand"></i> Extract Details
+      </button>
+    </div>
+  }
+
+  <!-- ── Result / Product detail ─────────────────────────────────── -->
+  @if (mode() === 'result') {
+    <div class="page-head">
+      <button class="back-btn" (click)="goBack()"><i class="ti ti-arrow-left"></i> Back</button>
+      <div class="page-title">
+        @if (fetching()) { <i class="ti ti-loader-2 spin"></i> Fetching product… }
+        @else { ✅ Product Details }
+      </div>
+    </div>
+
+    @if (fetching()) {
+      <div class="fetching-state">
+        <div class="fetch-spinner"></div>
+        <div class="fetch-label">Searching Open Food Facts database…</div>
+        <div class="fetch-sub">Fetching name, ingredients, nutrition data</div>
+      </div>
+    }
+
+    @if (!fetching() && product(); as p) {
+      @if (fetchError()) {
+        <div class="warn-box">
+          <i class="ti ti-alert-triangle"></i> {{ fetchError() }}
+        </div>
+      }
+
+      <div class="product-card">
+        @if (p.imageUrl) {
+          <img class="product-img" [src]="p.imageUrl" [alt]="p.name" />
+        } @else {
+          <div class="product-img-placeholder">{{ svc.catEmoji(p.cat) }}</div>
+        }
+
+        <div class="product-info">
+          <div class="product-name">{{ p.name || 'Unknown Product' }}</div>
+          @if (p.brand) {
+            <div class="product-brand">{{ p.brand }}</div>
+          }
+          <div class="product-tags">
+            <span class="ptag cat">{{ p.cat | titlecase }}</span>
+            @if (p.nutriScore) {
+              <span class="ptag nutri" [style.background]="nutriColor(p.nutriScore)">
+                Nutri-Score {{ p.nutriScore }}
+              </span>
+            }
+            @if (p.barcode) {
+              <span class="ptag bc">🔢 {{ p.barcode }}</span>
+            }
+          </div>
+        </div>
+      </div>
+
+      @if (p.ingredients) {
+        <div class="detail-section">
+          <div class="detail-title"><i class="ti ti-list"></i> Ingredients</div>
+          <div class="detail-text">{{ p.ingredients }}</div>
+        </div>
+      }
+
+      <!-- Edit before saving -->
+      <div class="edit-section">
+        <div class="detail-title"><i class="ti ti-edit"></i> Confirm & Save</div>
+
+        <div class="form-grid">
+          <div class="form-field">
+            <label class="form-label">Expiry date</label>
+            <input
+              class="form-input"
+              type="date"
+              [ngModel]="formExpiry()"
+              (ngModelChange)="formExpiry.set($event)"
+            />
+          </div>
+          <div class="form-field">
+            <label class="form-label">Quantity</label>
+            <input
+              class="form-input"
+              type="number"
+              min="1"
+              [ngModel]="p.qty"
+              (ngModelChange)="p.qty = +$event"
+            />
+          </div>
+          <div class="form-field">
+            <label class="form-label">Unit</label>
+            <input
+              class="form-input"
+              [ngModel]="p.unit"
+              (ngModelChange)="p.unit = $event"
+              placeholder="g / kg / pcs / L"
+            />
+          </div>
+          <div class="form-field ff-full">
+            <label class="form-label">Note (optional)</label>
+            <input
+              class="form-input"
+              placeholder="e.g. Fridge shelf 1"
+              [ngModel]="formNote()"
+              (ngModelChange)="formNote.set($event)"
+            />
+          </div>
+        </div>
+
+        @if (!added()) {
+          <button class="btn-save" (click)="confirmAdd()">
+            <i class="ti ti-plus"></i> Save to Pantry
+          </button>
+        } @else {
+          <div class="success-msg">
+            <i class="ti ti-circle-check"></i> Saved to pantry successfully!
+          </div>
+        }
+      </div>
+    }
+  }
+
+</div>
+
+<div class="toast" [class.show]="toastVisible()" role="status">{{ toastMsg() }}</div>

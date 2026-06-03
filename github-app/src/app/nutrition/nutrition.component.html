@@ -1,0 +1,67 @@
+<div class="page">
+  <div class="page-head">
+    <div class="page-title"><i class="ti ti-heart-rate-monitor"></i> Nutrition Analyzer</div>
+    <div class="page-sub">AI-powered nutrition insights from your pantry</div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary-card">
+    <div class="sum-title">📊 Pantry Nutrition Summary</div>
+    <div class="sum-sub">Based on {{ svc.freshCount() + svc.soonCount() }} active items</div>
+    <div class="macro-grid">
+      <div class="macro"><div class="macro-val cal">{{ totalNutrition().calories }}</div><div class="macro-lbl">Calories</div></div>
+      <div class="macro"><div class="macro-val pro">{{ totalNutrition().protein }}g</div><div class="macro-lbl">Protein</div></div>
+      <div class="macro"><div class="macro-val car">{{ totalNutrition().carbs }}g</div><div class="macro-lbl">Carbs</div></div>
+      <div class="macro"><div class="macro-val fat">{{ totalNutrition().fat }}g</div><div class="macro-lbl">Fat</div></div>
+    </div>
+    <div class="macro-bars">
+      <div class="mbar-row">
+        <span class="mbar-lbl">Protein</span>
+        <div class="mbar"><div class="mbar-fill pro" [style.width.%]="barWidth(totalNutrition().protein, 200)"></div></div>
+        <span class="mbar-val">{{ totalNutrition().protein }}g</span>
+      </div>
+      <div class="mbar-row">
+        <span class="mbar-lbl">Carbs</span>
+        <div class="mbar"><div class="mbar-fill car" [style.width.%]="barWidth(totalNutrition().carbs, 500)"></div></div>
+        <span class="mbar-val">{{ totalNutrition().carbs }}g</span>
+      </div>
+      <div class="mbar-row">
+        <span class="mbar-lbl">Fat</span>
+        <div class="mbar"><div class="mbar-fill fat" [style.width.%]="barWidth(totalNutrition().fat, 200)"></div></div>
+        <span class="mbar-val">{{ totalNutrition().fat }}g</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Per item -->
+  <div class="section-title"><i class="ti ti-list"></i> Per Item Nutrition</div>
+  <div class="item-list">
+    @for (item of svc.items(); track item.id) {
+      @if (svc.getStatus(item.expiry) !== 'expired') {
+        <div class="nutr-item" (click)="selected.set(selected()===item.id ? null : item.id)">
+          <div class="ni-top">
+            <span class="ni-emoji">{{ svc.catEmoji(item.cat) }}</span>
+            <div class="ni-info">
+              <div class="ni-name">{{ item.name }}</div>
+              <div class="ni-cat">{{ item.cat | titlecase }}</div>
+            </div>
+            <div class="ni-cal">{{ getNutrition(item.cat).calories }} kcal</div>
+            <i class="ti" [class.ti-chevron-down]="selected()!==item.id" [class.ti-chevron-up]="selected()===item.id" style="color:var(--muted)"></i>
+          </div>
+
+          @if (selected() === item.id) {
+            <div class="ni-detail">
+              <div class="ni-macros">
+                <div class="nim"><span class="nim-lbl">Protein</span><span class="nim-val">{{ getNutrition(item.cat).protein }}g</span></div>
+                <div class="nim"><span class="nim-lbl">Carbs</span><span class="nim-val">{{ getNutrition(item.cat).carbs }}g</span></div>
+                <div class="nim"><span class="nim-lbl">Fat</span><span class="nim-val">{{ getNutrition(item.cat).fat }}g</span></div>
+                <div class="nim"><span class="nim-lbl">Fiber</span><span class="nim-val">{{ getNutrition(item.cat).fiber }}g</span></div>
+              </div>
+              <div class="ni-tip"><i class="ti ti-bulb"></i> {{ getNutrition(item.cat).tip }}</div>
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+</div>

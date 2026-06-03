@@ -1,0 +1,486 @@
+:host { display: block; }
+
+.page {
+  padding: 0 1rem 80px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+// ── Header ──────────────────────────────────────────────────────────
+.page-head {
+  padding: 1.25rem 0 1rem;
+  border-bottom: 1px solid #2d4a2d;
+  margin-bottom: 1.25rem;
+}
+.page-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  color: #f0ead6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  i { font-size: 20px; color: #4caf50; }
+}
+.page-sub { font-size: 12px; color: #6a8f6a; margin-top: 4px; line-height: 1.5; }
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid #2d4a2d;
+  color: #6a8f6a;
+  font-family: inherit;
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: .75rem;
+  transition: all .2s;
+  &:hover { border-color: #4caf50; color: #76c442; }
+}
+
+// ── Scan option cards ───────────────────────────────────────────────
+.scan-options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.25rem; }
+
+.scan-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #162416;
+  border: 1px solid #2d4a2d;
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  transition: all .2s;
+  text-align: left;
+
+  &:hover { border-color: #4caf50; transform: translateY(-1px); }
+
+  &.primary {
+    border-color: #4caf50;
+    background: linear-gradient(135deg, #162416, #1d3a1d);
+  }
+}
+
+.scan-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #4caf50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  i { font-size: 26px; color: #0f1a0f; }
+
+  &.secondary { background: #2d4a2d; i { color: #76c442; } }
+}
+
+.scan-card-content { flex: 1; }
+.scan-card-title { font-size: 15px; font-weight: 600; color: #f0ead6; margin-bottom: 4px; }
+.scan-card-sub { font-size: 12px; color: #6a8f6a; line-height: 1.5; margin-bottom: 8px; }
+.scan-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.tag { background: #1a2e1a; border: 1px solid #2d4a2d; color: #76c442; font-size: 10px; padding: 2px 7px; border-radius: 6px; }
+.arrow { font-size: 18px; color: #4a6a4a; flex-shrink: 0; }
+
+// ── How it works ────────────────────────────────────────────────────
+.hiw {
+  background: #162416;
+  border: 1px solid #2d4a2d;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+.hiw-title { font-size: 13px; font-weight: 600; color: #e8f0e8; margin-bottom: .75rem; display: flex; align-items: center; gap: 6px; i { color: #4caf50; } }
+.hiw-steps { display: flex; flex-direction: column; gap: 8px; }
+.hiw-step { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: #8aab8a; }
+.sn { width: 22px; height: 22px; background: #2d4a2d; color: #76c442; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+// ── Camera viewfinder ────────────────────────────────────────────────
+.viewfinder-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto 1rem;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 4/3;
+}
+
+.camera-feed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.scan-canvas {
+  display: none;
+}
+
+.vf-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+// Corner brackets
+.vf-corner {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-color: #4caf50;
+  border-style: solid;
+
+  &.tl { top: 16px; left: 16px; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
+  &.tr { top: 16px; right: 16px; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
+  &.bl { bottom: 16px; left: 16px; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
+  &.br { bottom: 16px; right: 16px; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
+}
+
+// Scanning laser line
+.scan-laser {
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #4caf50, #76c442, #4caf50, transparent);
+  border-radius: 2px;
+  box-shadow: 0 0 8px #4caf50;
+  animation: laserScan 2s ease-in-out infinite;
+}
+
+@keyframes laserScan {
+  0%   { top: 15%; opacity: .8; }
+  50%  { top: 80%; opacity: 1; }
+  100% { top: 15%; opacity: .8; }
+}
+
+.vf-status {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,.65);
+  color: #e8f0e8;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  i { font-size: 15px; color: #4caf50; }
+
+  &.detected { background: rgba(76,175,80,.3); color: #76c442; }
+}
+
+.camera-loading {
+  text-align: center;
+  color: #6a8f6a;
+  font-size: 13px;
+  padding: .75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.camera-tip {
+  background: #1a2e1a;
+  border: 1px solid #2d4a2d;
+  border-radius: 10px;
+  padding: .75rem 1rem;
+  font-size: 12px;
+  color: #6a8f6a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  i { color: #f5a623; font-size: 15px; }
+}
+
+// ── Error / warning boxes ────────────────────────────────────────────
+.error-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #3d1a1a;
+  border: 1px solid #e74c3c;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  i { font-size: 20px; color: #e74c3c; flex-shrink: 0; margin-top: 2px; }
+}
+.err-title { font-size: 14px; font-weight: 600; color: #e87070; margin-bottom: 4px; }
+.err-msg   { font-size: 12px; color: #b07070; line-height: 1.5; }
+
+.warn-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #3d3010;
+  border: 1px solid #f5a623;
+  border-radius: 10px;
+  padding: .75rem 1rem;
+  font-size: 13px;
+  color: #f5c842;
+  margin-bottom: 1rem;
+  i { font-size: 16px; }
+}
+
+// ── Manual entry ────────────────────────────────────────────────────
+.manual-panel { display: flex; flex-direction: column; gap: 1rem; }
+
+.sample-barcodes { }
+.sample-label { font-size: 11px; color: #6a8f6a; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .5px; }
+.sample-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.sample-chip {
+  background: #1a2e1a;
+  border: 1px solid #2d4a2d;
+  color: #76c442;
+  font-family: inherit;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .2s;
+  &:hover { border-color: #4caf50; background: #2d4a2d; }
+}
+
+// ── OCR panel ───────────────────────────────────────────────────────
+.ocr-panel { display: flex; flex-direction: column; gap: 1rem; }
+.ocr-example { background: #0f1a0f; border: 1px solid #2d4a2d; border-radius: 10px; padding: .9rem; }
+.example-lbl  { font-size: 10px; color: #6a8f6a; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+.example-text { font-size: 12px; color: #a0bfa0; font-family: monospace; line-height: 1.6; margin-bottom: 8px; white-space: pre-line; }
+
+// ── Fetching state ──────────────────────────────────────────────────
+.fetching-state {
+  text-align: center;
+  padding: 2.5rem 1rem;
+
+  .fetch-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid #2d4a2d;
+    border-top-color: #4caf50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+  }
+
+  .fetch-label { font-size: 15px; font-weight: 600; color: #e8f0e8; margin-bottom: 4px; }
+  .fetch-sub   { font-size: 12px; color: #6a8f6a; }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── Product card ─────────────────────────────────────────────────────
+.product-card {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: #162416;
+  border: 1px solid #2d4a2d;
+  border-radius: 14px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.product-img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #f0ead6;
+  flex-shrink: 0;
+}
+
+.product-img-placeholder {
+  width: 90px;
+  height: 90px;
+  border-radius: 10px;
+  background: #2d4a2d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  flex-shrink: 0;
+}
+
+.product-name  { font-size: 17px; font-weight: 700; color: #f0ead6; line-height: 1.3; margin-bottom: 4px; }
+.product-brand { font-size: 13px; color: #6a8f6a; margin-bottom: 8px; }
+.product-tags  { display: flex; flex-wrap: wrap; gap: 5px; }
+.ptag {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-weight: 600;
+
+  &.cat    { background: #1a2e1a; color: #76c442; border: 1px solid #2d4a2d; }
+  &.nutri  { color: #0f1a0f; }
+  &.bc     { background: #1a2e1a; color: #8aab8a; border: 1px solid #2d4a2d; }
+}
+
+// ── Detail sections ──────────────────────────────────────────────────
+.detail-section {
+  background: #162416;
+  border: 1px solid #2d4a2d;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.detail-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #e8f0e8;
+  margin-bottom: .6rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  i { color: #4caf50; }
+}
+
+.detail-text {
+  font-size: 12px;
+  color: #8aab8a;
+  line-height: 1.7;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+// ── Edit & save section ──────────────────────────────────────────────
+.edit-section {
+  background: #162416;
+  border: 1px solid #4caf50;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.form-field { display: flex; flex-direction: column; gap: 4px; &.ff-full { grid-column: 1/-1; } }
+.form-label { font-size: 10px; color: #6a8f6a; text-transform: uppercase; letter-spacing: .5px; }
+
+.form-input {
+  background: #0f1a0f;
+  border: 1px solid #2d4a2d;
+  color: #e8f0e8;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color .2s;
+  &:focus { border-color: #4caf50; }
+  &::placeholder { color: #6a8f6a; }
+
+  &.large { font-size: 16px; padding: 12px 14px; letter-spacing: 1px; }
+}
+
+.form-textarea {
+  background: #0f1a0f;
+  border: 1px solid #2d4a2d;
+  color: #e8f0e8;
+  border-radius: 8px;
+  padding: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  resize: vertical;
+  &:focus { border-color: #4caf50; }
+  &::placeholder { color: #6a8f6a; }
+}
+
+// ── Buttons ──────────────────────────────────────────────────────────
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  background: #4caf50;
+  border: none;
+  color: #0f1a0f;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .2s;
+  i { font-size: 16px; }
+  &:hover:not(:disabled) { background: #76c442; }
+  &:disabled { opacity: .5; cursor: default; }
+}
+
+.btn-save {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  background: #4caf50;
+  border: none;
+  color: #0f1a0f;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .2s;
+  i { font-size: 18px; }
+  &:hover { background: #76c442; }
+}
+
+.success-msg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #76c442;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 14px;
+  background: #1d3a1d;
+  border: 1px solid #4caf50;
+  border-radius: 10px;
+  i { font-size: 20px; }
+}
+
+// ── Toast ────────────────────────────────────────────────────────────
+.toast {
+  position: fixed;
+  bottom: 76px;
+  right: 1rem;
+  background: #2d4a2d;
+  border: 1px solid #4caf50;
+  color: #f0ead6;
+  padding: 9px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 200;
+  transform: translateY(60px);
+  opacity: 0;
+  transition: all .3s;
+  pointer-events: none;
+  &.show { transform: translateY(0); opacity: 1; }
+}
+
+.spin { animation: spin 1s linear infinite; }
+
+@media (max-width: 480px) {
+  .product-card { flex-direction: column; }
+  .product-img, .product-img-placeholder { width: 100%; height: 180px; }
+}

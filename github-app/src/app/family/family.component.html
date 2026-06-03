@@ -1,0 +1,93 @@
+<div class="page">
+  <div class="page-head">
+    <div class="page-title"><i class="ti ti-users"></i> Family Sharing</div>
+    <div class="page-sub">Share your pantry with family members</div>
+  </div>
+
+  <!-- How it works -->
+  <div class="how-card">
+    <div class="hw-title"><i class="ti ti-info-circle"></i> How Family Sharing Works</div>
+    <div class="hw-steps">
+      <div class="hw-step"><span class="sn">1</span> Invite family members by email</div>
+      <div class="hw-step"><span class="sn">2</span> They accept and join your pantry</div>
+      <div class="hw-step"><span class="sn">3</span> Everyone can view & add food items</div>
+      <div class="hw-step"><span class="sn">4</span> All get expiry alerts together</div>
+    </div>
+  </div>
+
+  <!-- Members list -->
+  <div class="section">
+    <div class="section-header">
+      <div class="sec-title"><i class="ti ti-users"></i> Members ({{ members().length }})</div>
+      <button class="btn-invite" (click)="toggleInvite()">
+        <i class="ti ti-user-plus"></i> Invite
+      </button>
+    </div>
+
+    @for (member of members(); track member.id) {
+      <div class="member-row">
+        <div class="member-avatar">{{ member.avatar }}</div>
+        <div class="member-info">
+          <div class="member-name">{{ member.name }}</div>
+          <div class="member-email">{{ member.email }}</div>
+          <div class="member-joined">Joined {{ member.joined }}</div>
+        </div>
+        <div class="member-right">
+          <span class="role-badge" [class.admin]="member.role==='admin'">
+            {{ member.role === 'admin' ? '👑 Admin' : '👤 Member' }}
+          </span>
+          @if (member.role !== 'admin') {
+            <button class="remove-btn" (click)="removeMember(member.id)">
+              <i class="ti ti-x"></i>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Invite form -->
+  @if (showInvite()) {
+    <div class="invite-form">
+      <div class="sec-title"><i class="ti ti-mail"></i> Send Invitation</div>
+
+      @if (inviteError()) {
+        <div class="error-msg"><i class="ti ti-alert-circle"></i> {{ inviteError() }}</div>
+      }
+
+      @if (inviteSent()) {
+        <div class="success-msg"><i class="ti ti-circle-check"></i> Invitation sent!</div>
+      }
+
+      <div class="form-field">
+        <label class="form-label">Name</label>
+        <input class="form-input" placeholder="Family member's name"
+          [ngModel]="inviteName()" (ngModelChange)="inviteName.set($event)" />
+      </div>
+      <div class="form-field">
+        <label class="form-label">Email address</label>
+        <input class="form-input" type="email" placeholder="their@email.com"
+          [ngModel]="inviteEmail()" (ngModelChange)="inviteEmail.set($event)"
+          (keyup.enter)="sendInvite()" />
+      </div>
+      <div class="form-actions">
+        <button class="btn-send" (click)="sendInvite()">
+          <i class="ti ti-send"></i> Send Invite
+        </button>
+        <button class="btn-cancel" (click)="toggleInvite()">Cancel</button>
+      </div>
+    </div>
+  }
+
+  <!-- Shared pantry info -->
+  <div class="shared-info">
+    <div class="si-icon">🔗</div>
+    <div class="si-title">Shared Pantry Link</div>
+    <div class="si-sub">Share this link to invite anyone to your pantry</div>
+    <div class="link-box">
+      <span class="link-text">smartfood.app/pantry/abc123</span>
+      <button class="copy-btn"><i class="ti ti-copy"></i> Copy</button>
+    </div>
+  </div>
+</div>
+<div class="toast" [class.show]="toastVisible()" role="status">{{ toastMsg() }}</div>

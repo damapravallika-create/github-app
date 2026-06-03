@@ -1,0 +1,99 @@
+<div class="page">
+  <div class="page-head">
+    <div class="page-title"><i class="ti ti-tools-kitchen-2"></i> AI Recipe Suggestions</div>
+    <div class="page-sub">Recipes based on items expiring soon — reduce waste, eat smart</div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab()==='suggested'" (click)="setTab('suggested')">
+      <i class="ti ti-wand"></i> Use Soon ({{ svc.suggestedRecipes().length }})
+    </button>
+    <button class="tab" [class.active]="activeTab()==='all'" (click)="setTab('all')">
+      <i class="ti ti-book-2"></i> All Recipes ({{ svc.allRecipes().length }})
+    </button>
+  </div>
+
+  <!-- Suggested header -->
+  @if (activeTab() === 'suggested') {
+    @if (svc.suggestedRecipes().length === 0) {
+      <div class="empty-state">
+        <i class="ti ti-chef-hat"></i>
+        <p>No urgent items right now — all your food is fresh! 🎉</p>
+      </div>
+    } @else {
+      <div class="use-soon-banner">
+        <i class="ti ti-alert-triangle" style="color:#f5a623"></i>
+        Use soon:
+        @for (item of svc.urgentItems().slice(0,4); track item.id) {
+          <span class="use-chip">{{ svc.catEmoji(item.cat) }} {{ item.name }}</span>
+        }
+      </div>
+    }
+  }
+
+  <!-- Recipe grid -->
+  <div class="recipe-grid">
+    @for (recipe of (activeTab()==='suggested' ? svc.suggestedRecipes() : svc.allRecipes()); track recipe.id) {
+      <div class="recipe-card" (click)="openRecipe(recipe)">
+        <div class="recipe-emoji">{{ recipe.emoji }}</div>
+        <div class="recipe-body">
+          <div class="recipe-title">{{ recipe.title }}</div>
+          <div class="recipe-desc">{{ recipe.description }}</div>
+          <div class="recipe-meta">
+            <span class="time-tag"><i class="ti ti-clock"></i> {{ recipe.time }}</span>
+            <span class="diff-tag" [style.color]="diffColor(recipe.difficulty)">{{ recipe.difficulty }}</span>
+          </div>
+          <div class="uses-row">
+            @for (u of recipe.usesItems.slice(0,3); track u) {
+              <span class="use-ingredient">{{ u }}</span>
+            }
+          </div>
+        </div>
+        <button class="save-btn" (click)="$event.stopPropagation(); toggleSave(recipe.id)"
+          [class.saved]="svc.isRecipeSaved(recipe.id)"
+          [attr.aria-label]="svc.isRecipeSaved(recipe.id) ? 'Unsave' : 'Save recipe'">
+          <i class="ti" [class.ti-heart-filled]="svc.isRecipeSaved(recipe.id)" [class.ti-heart]="!svc.isRecipeSaved(recipe.id)"></i>
+        </button>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Recipe detail drawer -->
+@if (selected()) {
+  <div class="drawer-overlay" (click)="closeRecipe()">
+    <div class="drawer" (click)="$event.stopPropagation()">
+      <button class="close-btn" (click)="closeRecipe()"><i class="ti ti-x"></i></button>
+      <div class="drawer-emoji">{{ selected()!.emoji }}</div>
+      <div class="drawer-title">{{ selected()!.title }}</div>
+      <div class="drawer-desc">{{ selected()!.description }}</div>
+      <div class="drawer-row">
+        <span><i class="ti ti-clock"></i> {{ selected()!.time }}</span>
+        <span [style.color]="diffColor(selected()!.difficulty)"><i class="ti ti-signal"></i> {{ selected()!.difficulty }}</span>
+      </div>
+      <div class="drawer-section">
+        <div class="drawer-sec-title">🛒 Ingredients</div>
+        <ul class="ingr-list">
+          @for (i of selected()!.ingredients; track i) {
+            <li>{{ i }}</li>
+          }
+        </ul>
+      </div>
+      <div class="drawer-section">
+        <div class="drawer-sec-title">🥗 Uses from your pantry</div>
+        <div class="uses-row">
+          @for (u of selected()!.usesItems; track u) {
+            <span class="use-ingredient">{{ u }}</span>
+          }
+        </div>
+      </div>
+      <button class="btn-save-full" (click)="toggleSave(selected()!.id)" [class.saved]="svc.isRecipeSaved(selected()!.id)">
+        <i class="ti" [class.ti-heart-filled]="svc.isRecipeSaved(selected()!.id)" [class.ti-heart]="!svc.isRecipeSaved(selected()!.id)"></i>
+        {{ svc.isRecipeSaved(selected()!.id) ? 'Saved!' : 'Save Recipe' }}
+      </button>
+    </div>
+  </div>
+}
+
+<div class="toast" [class.show]="toastVisible()" role="status">{{ toastMsg() }}</div>
